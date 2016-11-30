@@ -9,7 +9,7 @@
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
 
-        SELECT TIMES    ASSIGN TO DISK
+        SELECT MAE-TIMES    ASSIGN TO DISK
                         ORGANIZATION IS INDEXED
                         ACCESS MODE IS SEQUENTIAL
                         RECORD KEY IS TIM-CLAVE
@@ -40,7 +40,7 @@
         DATA DIVISION.
         FILE SECTION.
  
-        FD TIMES    LABEL RECORD IS STANDARD
+        FD MAE-TIMES    LABEL RECORD IS STANDARD
                     VALUE OF FILE-ID IS "Times.dat".
         01 REG-TIMES.
             02 TIM-CLAVE.
@@ -171,12 +171,18 @@
              05 FILLER PIC X VALUE SPACES.
              05 FILLER PIC X(6) VALUE 'Cuit: '.
              05 FILLER PIC X(73) VALUE SPACES.
-       01 ENCABEZADO-TABLA
+       01 ENCABEZADO-TABLA.
           03 FILLER PIC X(25) VALUE ' FECHA         PROFESOR  '.
           03 FILLER PIC X(31) VALUE '    NOMBRE                     '.
           03 FILLER PIC X(24) VALUE '       HORAS     IMPORTE'.
        01 LINEA-HORIZONTAL.
           03 FILLER PIC X(80) VALUE ALL "_".
        
+
+       PROCEDURE DIVISION.
+      *****************************************
+      *****************************************
+        DISPLAY "ESTE ES UN MENSAJE".
+        STOP RUN.       
 
        
