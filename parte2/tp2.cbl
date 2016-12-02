@@ -250,17 +250,19 @@
         OPEN INPUT PROFESORES.
         OPEN INPUT TARIFAS.
         OPEN INPUT PARAMETROS.
+        DISPLAY "FIN INICIO ENTRADA".
 
       *****************************************************
       *****************************************************
        0200-LEER-PARAMETROS.
         READ PARAMETROS.
+        DISPLAY "FIN LECTURA PARAMETROS".
 
       *****************************************************
       *****************************************************
        0300-LEER-MAE-TIMES.
         READ MAE-TIMES RECORD.
-
+      *DISPLAY "FIN LECTURA TIMES".
       *****************************************************
       *****************************************************
        0400-PROCESAR-TIMES.
@@ -268,6 +270,7 @@
         PERFORM 0600-BUSCAR-PROFESOR.
         PERFORM 0700-PROCESAR-PROFESOR UNTIL TIMES-ESTADO EQUAL'10'
                 OR (PROFESOR-ANTERIOR NOT EQUAL TIM-NUMERO).
+        DISPLAY "FIN PROCESAR TIMES".
         
       *****************************************************
       *****************************************************
@@ -283,6 +286,7 @@
         READ PROFESORES RECORD.
         IF OK-PROF THEN
             MOVE PROF-NOMBRE TO REG-RELEASE-PROF-NOMBRE      
+            DISPLAY "ENCONTRE PROFESOR"
         ELSE
             DISPLAY "NO SE ENCONTRARON LOS DATOS DEL PROFESOR".
 
@@ -301,6 +305,7 @@
         MOVE 0 TO TIM-CUIT.
         PERFORM 0300-LEER-MAE-TIMES UNTIL EOF-TIM OR 
        (PAR-CUIT-HASTA >= TIM-CUIT AND TIM-CUIT >= PAR-CUIT-DESDE).
+        DISPLAY "FIN PROCESAR PROFESOR".
       
       *****************************************************
       *****************************************************
