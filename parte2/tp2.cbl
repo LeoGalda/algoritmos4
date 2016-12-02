@@ -201,7 +201,11 @@
              INPUT PROCEDURE IS ENTRADA.
              OUTPUT PROCEDURE IS SALIDA.
         STOP RUN.       
-        
+
+
+
+      *****************************************************
+      *****************************************************  
        ENTRADA SECTION.
       *****************************************************
       *****************************************************
@@ -211,7 +215,63 @@
        (PAR-CUIT-HASTA >=  TIM-CUIT AND TIM-CUIT >= PAR-CUIT-DESDE).
        PERFORM PROCESAR-TIMES UNTIL FS-TIMES EQUAL '10'.
        PERFORM 0400-FIN-ENTRADA.
+       
+      *****************************************************
+      *****************************************************
+       0100-INICIO-ENTRADA.
+        OPEN INPUT MAE-TIMES.
+        OPEN INPUT PROFESORES.
+        OPEN INPUT TARIFAS.
+        OPEN INPUT PARAMETROS.
 
       *****************************************************
       *****************************************************
+       0200-LEER-PARAMETROS.
+        READ PARAMETROS.
+
+      *****************************************************
+      *****************************************************
+       0300-LEER-MAE-TIMES.
+        READ MAE-TIMES RECORD.
+
+      *****************************************************
+      *****************************************************
+       0400-PROCESAR-TIMES.
+        MOVE TIM-NUMERO TO PROFESOR-ANTERIOR.
+        PERFORM 0500-BUSCAR-PROFESOR.
+        PERFORM 0600-PROCESAR-PROFESOR UNTIL FS-TIMES EQUAL'10'
+                OR (PROFESOR-ANTERIOR NOT EQUAL TIM-NUMERO).
+        
+      *****************************************************
+      *****************************************************
+       0500-BUSCAR-PROFESOR.
+        MOVE PROFESOR-ANTERIOR TO PROF-NUMERO.
+        READ PROFESORES RECORD.
+        IF OK-PROF THEN
+            MOVE PROF-NOMBRE TO REG-RELEASE-PROF-NOMBRE
+        ELSE
+            DISPLAY "NO SE ENCONTRARON LOS DATOS DEL PROFESOR".
+
+      *****************************************************
+      *****************************************************
+       0600-PROCESAR-PROFESOR.
+        PERFORM 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
