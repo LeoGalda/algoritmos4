@@ -79,6 +79,7 @@
                03 TAR-TIP-CLASE PIC X(4).
                03 TAR-VIG-DES PIC 9(8).
             02 TAR-TARIFA PIC 9(5)V99.
+
        FD PARAMETROS LABEL RECORD IS STANDARD
                      VALUE OF FILE-ID IS "Parametros.dat".
        01 REG-PARAMETROS.
@@ -106,18 +107,28 @@
        77 TAR-ESTADO PIC XX.        
        77 PAR-ESTADO PIC XX.
        77 ARCH-ESTADO PIC XX.                    
-       77 EOF-TIMES PIC XX VALUE "NO".
-          88 EOF-TIMES VALUE "SI".
-       77 EOF-PROF PIC XX VALUE "NO".
-          88 EOF-PROF VALUE "SI".
-       77 EOF-SUC PIC XX VALUE "NO".
-          88 EOF-SUC VALUE "SI".
-       77 EOF-TAR PIC XX VALUE "NO".
-          88 EOF-TAR VALUE "SI".
-       77 EOF-PAR PIC XX VALUE "NO".
-          88 EOF-PAR VALUE "SI".
-       77 EOF-ARCH PIC XX VALUE "NO".
-          88 EOF-ARCH VALUE "SI".
+       77 TIMES-ESTADO PIC XX.
+           88 OK-TIM VALUE '00'.
+           88 NO-TIM VALUE '17'.
+           88 EOF-TIM VALUE '10'.
+       77 PROF-ESTADO PIC XX.
+           88 OK-PROF VALUE '00'.
+           88 NO-PROF VALUE '17'.
+           88 EOF-PROF VALUE '10'.
+       77 SUC-ESTADO PIC XX.
+           88 OK-SUC VALUE '00'.
+           88 NO-SUC VALUE '17'.
+           88 EOF-SUC VALUE '10'.
+       77 TAR-ESTADO PIC XX.
+           88 OK-TAR VALUE '00'.
+           88 NO-TAR VALUE '17'.
+           88 EOF-TAR VALUE '10'.
+       77 ARCHIVO-ESTADO PIC XX.
+           88 OK-ORD VALUE '00'.
+           88 NO-ORD VALUE '17'.
+           88 EOF-ORD VALUE '10'.
+       77 EOF-ARCH-ORDENADO PIC XX.
+           88 EOF-ARCHIVO-ORDENADO VALUE 'SI'
 
        01 REG-RELEASE.
            02 REG-RELEASE-SUC-RAZON PIC X(25).
@@ -180,9 +191,27 @@
        
 
        PROCEDURE DIVISION.
-      *****************************************
-      *****************************************
-        DISPLAY "ESTE ES UN MENSAJE".
+      *****************************************************
+      *****************************************************
+        SORT ARCHIVO-ORDENADO.
+             ON ASCENDING KEY ORD-SUC-RAZON
+             ON ASCENDING KEY ORD-SUC-CUIT
+             ON ASCENDING KEY ORD-TIM-FECHA
+             ON ASCENDING KEY ORD-PROF-NUMERO
+             INPUT PROCEDURE IS ENTRADA.
+             OUTPUT PROCEDURE IS SALIDA.
         STOP RUN.       
+        
+       ENTRADA SECTION.
+      *****************************************************
+      *****************************************************
+       PERFORM 0100-INICIO-ENTRADA.
+       PERFORM 0200-LEER-PARAMETROS.
+       PERFORM 0300-LEER-MAE-TIMES UNTIL EOF-TIM OR
+       (PAR-CUIT-HASTA >=  TIM-CUIT AND TIM-CUIT >= PAR-CUIT-DESDE).
+       PERFORM PROCESAR-TIMES UNTIL FS-TIMES EQUAL '10'.
+       PERFORM 0400-FIN-ENTRADA.
 
-       
+      *****************************************************
+      *****************************************************
+
