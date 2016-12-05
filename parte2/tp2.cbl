@@ -205,7 +205,7 @@
           03 MOSTRAR-PROFESOR PIC X(5).
           03 FILLER PIC X(10) VALUE SPACES.
           03 MOSTRAR-NOMBRE PIC X(25).
-          03 FILLER PIC X(1) VALUE SPACES.
+          03 FILLER PIC X(6) VALUE SPACES.
           03 MOSTRAR-HORAS PIC Z9,99.
           03 FILLER PIC X(1) VALUE SPACES.
           03 MOSTRAR-IMPORTE PIC ZZZZZZ9,99.
@@ -392,7 +392,7 @@
         PERFORM 1400-PROCESAR-POR-CUIT UNTIL EOF-ARCHIVO-ORDENADO OR
                 ANTERIOR-CUIT NOT EQUAL ORD-SUC-CUIT.
         IF LINEA-A-ESCRIBIR > 60 THEN PERFORM 1500-SALTO-DE-PAGINA.
-        PERFORM 1100-LEER-ORDENADO.
+        PERFORM 1500-SALTO-DE-PAGINA.
  
       *****************************************************
       *****************************************************
@@ -440,7 +440,7 @@
         ADD 1 TO LINEA-A-ESCRIBIR.
         ADD ORD-HORAS TO HORAS-FECHA.
         ADD ORD-IMPORTE TO IMPORTE-FECHA.
-        PERFORM-LEER-ORDENADO.
+        PERFORM 1100-LEER-ORDENADO.
       *****************************************************
       *****************************************************
        1700-FIN-SALIDA.
