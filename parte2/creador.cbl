@@ -1,0 +1,152 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. GENERADORDEINDEXADOS.
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       SPECIAL-NAMES.
+          DECIMAL-POINT IS COMMA.
+
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.      
+
+        SELECT MAE-TIMES    ASSIGN TO DISK
+                        ORGANIZATION IS SEQUENTIAL.
+        SELECT PROFESORES ASSIGN TO DISK
+                          ORGANIZATION IS SEQUENTIAL.
+        SELECT SUCURSALES ASSIGN TO DISK
+                          ORGANIZATION IS SEQUENTIAL.
+        SELECT TARIFAS  ASSIGN TO DISK
+                        ORGANIZATION IS SEQUENTIAL.
+        SELECT MAE-TIMESIND    ASSIGN TO DISK
+                        ORGANIZATION IS INDEXED
+                        ACCESS MODE IS RANDOM
+                        RECORD KEY IS TIM-CLAVE.
+        SELECT PROFESORESIND ASSIGN TO DISK
+                          ORGANIZATION IS INDEXED
+                          ACCESS MODE IS RANDOM
+                          RECORD KEY IS PROF-NUMERO.
+        SELECT SUCURSALESIND ASSIGN TO DISK
+                          ORGANIZATION IS INDEXED
+                          ACCESS MODE IS RANDOM
+                          RECORD KEY IS SUC-SUCURSAL.
+        SELECT TARIFASIND ASSIGN TO DISK
+                       ORGANIZATION IS INDEXED
+                       ACCESS MODE IS DYNAMIC
+                       RECORD KEY IS TAR-CLAVE.
+
+        DATA DIVISION.
+        FILE SECTION.
+        FD MAE-TIMES    LABEL RECORD IS STANDARD
+                    VALUE OF FILE-ID IS "Times.dat".
+        01 REG-TIMES PIC X(37).
+        FD PROFESORES LABEL RECORD IS STANDARD
+                      VALUE OF FILE-ID IS "Profesores.dat".
+        01 REG-PROFESORES PIC X(78).
+        FD SUCURSALES LABEL RECORD IS STANDARD
+                      VALUE OF FILE-ID IS "Sucursales.dat".
+        01 REG-SUCURSALES PIC X(80).
+       FD TARIFAS LABEL RECORD IS STANDARD
+                  VALUE OF FILE-ID IS "Tarifas.dat".
+        01 REG-TARIFAS PIC X(20).
+
+       FD MAE-TIMESIND LABEL RECORD IS STANDARD
+                    VALUE OF FILE-ID IS "TimesI.dat".
+       01 REG-TIMESI.
+            02 TIM-CLAVE.
+                03 TIM-NUMERO PIC X(5).
+                03 TIM-FECHA.
+                   05 TIM-FECHA-ANIO PIC 9(4).
+                   05 TIM-FECHA-MES PIC 99.
+                   05 TIM-FECHA-DIA PIC 99.
+                03 TIM-CUIT PIC 9(11).
+                03 TIM-SEC  PIC 9(4).
+            02 TIM-TIP-CLASE PIC X(4).
+            02 TIM-HORAS PIC 9(4).
+
+       FD PROFESORESIND LABEL RECORD IS STANDARD
+                      VALUE OF FILE-ID IS "ProfesoresI.dat".
+       01 REG-PROFESORESI.
+            02 PROF-NUMERO PIC X(5).
+            02 PROF-DNI PIC 9(8).
+            02 PROF-NOMBRE PIC X(25).
+            02 PROF-DIRE PIC X(20).
+            02 PROF-TEL PIC X(20).
+
+       FD SUCURSALESIND LABEL RECORD IS STANDARD
+                      VALUE OF FILE-ID IS "SucursalesI.dat".
+       01 REG-SUCURSALESI.
+            02 SUC-SUCURSAL PIC X(3).
+            02 SUC-RAZON PIC X(25).
+            02 SUC-DIRE PIC X(20).
+            02 SUC-TEL PIC X(20).
+            02 SUC-CUIT PIC 9(11).
+       FD TARIFASIND LABEL RECORD IS STANDARD
+                  VALUE OF FILE-ID IS "TarifasI.dat".
+       01 REG-TARIFASI.
+            02 TAR-CLAVE.
+               03 TAR-TIP-CLASE PIC X(4).
+               03 TAR-VIG-DES PIC 9(8).
+            02 TAR-TARIFA PIC 9(7).
+
+       WORKING-STORAGE SECTION.
+        77 EOF-PROF PIC XX VALUE "NO".
+            88 EOF-PROFESORES VALUE "SI".
+        77 EOF-MAE PIC XX VALUE "NO".
+            88 EOF-MAESTRO VALUE "SI".
+        77 EOF-SUC PIC XX VALUE "NO".
+            88 EOF-SUCURSALES VALUE "SI".
+        77 EOF-TAR PIC XX VALUE "NO".
+            88 EOF-TARIFAS VALUE "SI".
+
+       PROCEDURE DIVISION.
+        PERFORM LECTURA.       
+        PERFORM LEERPROF UNTIL EOF-PROFESORES.
+        DISPLAY "LISTO PROFESORES".
+        PERFORM LEERSUC UNTIL EOF-SUCURSALES.
+        DISPLAY "LISTO SUCURSALES".
+        PERFORM LEERTAR UNTIL EOF-TARIFAS.
+        DISPLAY "LISTO TARIFAS".
+        PERFORM LEERMAESTRO UNTIL EOF-MAESTRO.
+        DISPLAY "LISTO MAESTRO".
+        PERFORM CERRARARCHIVOS.
+        DISPLAY "FIN".
+        STOP RUN.
+
+        LECTURA.
+         OPEN INPUT MAE-TIMES.
+         OPEN INPUT PROFESORES.
+         OPEN INPUT TARIFAS.
+         OPEN INPUT SUCURSALES.
+         OPEN OUTPUT MAE-TIMESIND.
+         OPEN OUTPUT PROFESORESIND.
+         OPEN OUTPUT TARIFASIND.
+         OPEN OUTPUT SUCURSALESIND.
+        LEERMAESTRO.
+         READ MAE-TIMES AT END MOVE "SI" TO EOF-MAE.         
+         IF EOF-MAE EQUAL "NO"
+         DISPLAY REG-TIMES
+         WRITE REG-TIMESI FROM REG-TIMES.
+        LEERPROF.         
+         READ PROFESORES AT END MOVE "SI" TO EOF-PROF.             
+         IF EOF-PROF EQUAL "NO"
+      *   DISPLAY REG-PROFESORES
+         WRITE REG-PROFESORESI FROM REG-PROFESORES.
+        LEERSUC.    
+         READ SUCURSALES AT END MOVE "SI" TO EOF-SUC.
+         IF EOF-SUC EQUAL "NO"
+      *   DISPLAY REG-SUCURSALES
+         WRITE REG-SUCURSALESI FROM REG-SUCURSALES.
+        LEERTAR.
+         READ TARIFAS AT END MOVE "SI" TO EOF-TAR.
+         IF EOF-TAR EQUAL "NO"
+         DISPLAY REG-TARIFAS
+         WRITE REG-TARIFASI FROM REG-TARIFAS.
+        CERRARARCHIVOS.
+         CLOSE MAE-TIMES.
+         CLOSE PROFESORES.
+         CLOSE TARIFAS.
+         CLOSE SUCURSALES.
+         CLOSE MAE-TIMESIND.
+         CLOSE PROFESORESIND.
+         CLOSE TARIFASIND.
+         CLOSE SUCURSALESIND.
+

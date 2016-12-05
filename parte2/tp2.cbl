@@ -21,12 +21,12 @@
                           FILE STATUS IS PROF-ESTADO.
         SELECT SUCURSALES ASSIGN TO DISK
                           ORGANIZATION IS INDEXED
-                          ACCESS MODE IS RANDOM
+                          ACCESS MODE IS SEQUENTIAL
                           RECORD KEY IS SUC-SUCURSAL
                           FILE STATUS IS SUC-ESTADO.
         SELECT TARIFAS ASSIGN TO DISK
                        ORGANIZATION IS INDEXED
-                       ACCESS MODE IS RANDOM
+                       ACCESS MODE IS DYNAMIC
                        RECORD KEY IS TAR-CLAVE
                        FILE STATUS IS TAR-ESTADO.
         SELECT PARAMETROS ASSIGN TO DISK
@@ -41,7 +41,7 @@
         FILE SECTION.
  
         FD MAE-TIMES    LABEL RECORD IS STANDARD
-                    VALUE OF FILE-ID IS "Times.dat".
+                    VALUE OF FILE-ID IS "TimesI.dat".
         01 REG-TIMES.
             02 TIM-CLAVE.
                 03 TIM-NUMERO PIC X(5).
@@ -55,7 +55,7 @@
             02 TIM-HORAS PIC 9(2)V99.
 
         FD PROFESORES LABEL RECORD IS STANDARD
-                      VALUE OF FILE-ID IS "Profesores.dat".
+                      VALUE OF FILE-ID IS "ProfesoresI.dat".
         01 REG-PROFESORES.
             02 PROF-NUMERO PIC X(5).
             02 PROF-DNI PIC 9(8).
@@ -64,7 +64,7 @@
             02 PROF-TEL PIC X(20).
 
         FD SUCURSALES LABEL RECORD IS STANDARD
-                      VALUE OF FILE-ID IS "Sucursales.dat".
+                      VALUE OF FILE-ID IS "SucursalesI.dat".
         01 REG-SUCURSALES.
             02 SUC-SUCURSAL PIC X(3).
             02 SUC-RAZON PIC X(25).
@@ -73,7 +73,7 @@
             02 SUC-CUIT PIC 9(11).
         
        FD TARIFAS LABEL RECORD IS STANDARD
-                  VALUE OF FILE-ID IS "Tarifas.dat".
+                  VALUE OF FILE-ID IS "TarifasI.dat".
        01 REG-TARIFAS.
             02 TAR-CLAVE.
                03 TAR-TIP-CLASE PIC X(4).
@@ -105,23 +105,23 @@
        77 PAR-ESTADO PIC XX.
        77 TIMES-ESTADO PIC XX.
            88 OK-TIM VALUE '00'.
-           88 NO-TIM VALUE '17'.
+           88 NO-TIM VALUE '23'.
            88 EOF-TIM VALUE '10'.
        77 PROF-ESTADO PIC XX.
            88 OK-PROF VALUE '00'.
-           88 NO-PROF VALUE '17'.
+           88 NO-PROF VALUE '23'.
            88 EOF-PROF VALUE '10'.
        77 SUC-ESTADO PIC XX.
            88 OK-SUC VALUE '00'.
-           88 NO-SUC VALUE '17'.
+           88 NO-SUC VALUE '23'.
            88 EOF-SUC VALUE '10'.
        77 TAR-ESTADO PIC XX.
            88 OK-TAR VALUE '00'.
-           88 NO-TAR VALUE '17'.
+           88 NO-TAR VALUE '23'.
            88 EOF-TAR VALUE '10'.
        77 ARCH-ESTADO PIC XX.
            88 OK-ORD VALUE '00'.
-           88 NO-ORD VALUE '17'.
+           88 NO-ORD VALUE '23'.
            88 EOF-ORD VALUE '10'.
        77 EOF-ARCH-ORDENADO PIC XX.
            88 EOF-ARCHIVO-ORDENADO VALUE 'SI'.
@@ -240,37 +240,52 @@
        PERFORM 0200-LEER-PARAMETROS.
        PERFORM 0300-LEER-MAE-TIMES UNTIL EOF-TIM OR
        (PAR-CUIT-HASTA >=  TIM-CUIT AND TIM-CUIT >= PAR-CUIT-DESDE).
-       PERFORM 0400-PROCESAR-TIMES UNTIL TIMES-ESTADO EQUAL '10'.
+       PERFORM 0400-PROCESAR-TIMES
+       UNTIL TIMES-ESTADO EQUAL '10'.
        PERFORM 0500-FIN-ENTRADA.
-       
+
+      *****************************************************
+      ***************************************************** 
+       SALIDA SECTION.
+      *****************************************************
+      *****************************************************
+       PERFORM 1000-INICIO-SALIDA.
+       MOVE 0 TO IMPORTE-TOTAL.
+       PERFORM 1100-LEER-ORDENADO.
+       PERFORM 1200-MOSTRAR-ENCABEZADO.
+       PERFORM 1300-FIN-SALIDA.
+
+      *****************************************************
+      *****************************************************
+       OTRA SECTION.
       *****************************************************
       *****************************************************
        0100-INICIO-ENTRADA.
         OPEN INPUT MAE-TIMES.
         OPEN INPUT PROFESORES.
         OPEN INPUT TARIFAS.
-        OPEN INPUT PARAMETROS.
-        DISPLAY "FIN INICIO ENTRADA".
+        OPEN INPUT PARAMETROS.      
 
       *****************************************************
       *****************************************************
        0200-LEER-PARAMETROS.
         READ PARAMETROS.
-        DISPLAY "FIN LECTURA PARAMETROS".
 
       *****************************************************
       *****************************************************
        0300-LEER-MAE-TIMES.
         READ MAE-TIMES RECORD.
-      *DISPLAY "FIN LECTURA TIMES".
+
       *****************************************************
       *****************************************************
        0400-PROCESAR-TIMES.
+       
         MOVE TIM-NUMERO TO PROFESOR-ANTERIOR.
         PERFORM 0600-BUSCAR-PROFESOR.
-        PERFORM 0700-PROCESAR-PROFESOR UNTIL TIMES-ESTADO EQUAL'10'
-                OR (PROFESOR-ANTERIOR NOT EQUAL TIM-NUMERO).
-        DISPLAY "FIN PROCESAR TIMES".
+        PERFORM 0700-PROCESAR-PROFESOR
+        UNTIL TIMES-ESTADO EQUAL'10'
+        OR (PROFESOR-ANTERIOR NOT EQUAL TIM-NUMERO).
+      
         
       *****************************************************
       *****************************************************
@@ -282,10 +297,10 @@
       *****************************************************
       *****************************************************
        0600-BUSCAR-PROFESOR.
-        MOVE PROFESOR-ANTERIOR TO PROF-NUMERO.
+        MOVE PROFESOR-ANTERIOR TO PROF-NUMERO.     
         READ PROFESORES RECORD.
         IF OK-PROF THEN
-            MOVE PROF-NOMBRE TO REG-RELEASE-PROF-NOMBRE      
+            MOVE PROF-NOMBRE TO REG-RELEASE-PROF-NOMBRE          
             DISPLAY "ENCONTRE PROFESOR"
         ELSE
             DISPLAY "NO SE ENCONTRARON LOS DATOS DEL PROFESOR".
@@ -293,56 +308,47 @@
       *****************************************************
       *****************************************************
        0700-PROCESAR-PROFESOR.
+ 
         PERFORM 0800-BUSCAR-SUCURSAL.
         MOVE TIM-HORAS TO REG-RELEASE-HORAS.
         MOVE TIM-CUIT TO REG-RELEASE-SUC-CUIT.
         MOVE TIM-NUMERO TO REG-RELEASE-PROF-NUMERO.
         MOVE TIM-FECHA TO REG-RELEASE-TIM-FECHA.
-        MOVE ANTERIOR-RAZON TO REG-RELEASE-SUC-RAZON
         PERFORM 0900-BUSCAR-TARIFAS.
-        COMPUTE REG-RELEASE-IMPORTE = TIM-HORAS * AUX-TARIFA.
-        RELEASE REG-ORDENADO FROM REG-RELEASE.
+        COMPUTE REG-RELEASE-IMPORTE = TIM-HORAS * AUX-TARIFA.   
+        RELEASE REG-ORDENADO FROM REG-RELEASE.  
+        DISPLAY "REGISTRO ORDENADO:"REG-ORDENADO.
         MOVE 0 TO TIM-CUIT.
         PERFORM 0300-LEER-MAE-TIMES UNTIL EOF-TIM OR 
        (PAR-CUIT-HASTA >= TIM-CUIT AND TIM-CUIT >= PAR-CUIT-DESDE).
-        DISPLAY "FIN PROCESAR PROFESOR".
+
       
       *****************************************************
       *****************************************************
        0800-BUSCAR-SUCURSAL.
-        OPEN INPUT SUCURSALES
-        PERFORM 5000-LEER-SUCURSALES UNTIL SUC-CUIT EQUAL MATCH-CUIT.
-        PERFORM UNTIL SUC-CUIT <>MATCH-CUIT OR EOF-SUC
-                MOVE REG-SUCURSALES TO SUC-ANTERIOR
-        PERFORM 5000-LEER-SUCURSALES
-        END-PERFORM.
-        DISPLAY ANTERIOR-RAZON.
+        OPEN INPUT SUCURSALES.
+        DISPLAY "SUCURSAL A BUSCAR:" TIM-CUIT.
+        PERFORM 4000-LEER-SUCURSAL UNTIL SUC-CUIT EQUAL TIM-CUIT.
+        MOVE SUC-RAZON TO REG-RELEASE-SUC-RAZON.
         CLOSE SUCURSALES.
+
       *****************************************************
       *****************************************************
-       5000-LEER-SUCURSALES.
+       4000-LEER-SUCURSAL.
         READ SUCURSALES RECORD.
+      *  DISPLAY "REGISTRO:" REG-SUCURSALES.
+
       *****************************************************
       *****************************************************
        0900-BUSCAR-TARIFAS.
         MOVE TIM-TIP-CLASE TO TAR-TIP-CLASE.
         MOVE TIM-FECHA TO TAR-VIG-DES.
-        READ TARIFAS RECORD KEY IS TAR-CLAVE.
+        READ TARIFAS RECORD KEY IS TAR-TIP-CLASE.
         IF OK-TAR THEN
            MOVE TAR-TARIFA TO AUX-TARIFA
+           DISPLAY "SE ENCONTRARON TARIFAS"
         ELSE
            DISPLAY "NO SE ENCONTRARON TARIFAS".
-
-      *****************************************************
-      *****************************************************
-       SALIDA SECTION.
-      *****************************************************
-      *****************************************************
-       PERFORM 1000-INICIO-SALIDA.
-       MOVE 0 TO IMPORTE-TOTAL.
-       PERFORM 1100-LEER-ORDENADO.
-       PERFORM 1200-MOSTRAR-ENCABEZADO.
-       PERFORM 1300-FIN-SALIDA.
        
       *****************************************************
       *****************************************************
@@ -355,7 +361,8 @@
 
       *****************************************************
       *****************************************************
-       1200-MOSTRAR-ENCABEZADO.
+       1200-MOSTRAR-ENCABEZADO.         
+           DISPLAY "MOSTRAR ENCABEZADO".
            MOVE FUNCTION CURRENT-DATE TO WS-CURRENT-DATE-FIELDS.
            MOVE WS-CURRENT-YEAR TO ANIO.
            MOVE WS-CURRENT-MONTH TO MES.
@@ -369,4 +376,3 @@
       *****************************************************
        1300-FIN-SALIDA.
            CLOSE LISTADOTP2.
-
