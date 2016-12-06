@@ -333,18 +333,9 @@
       *****************************************************
       *****************************************************
        0800-BUSCAR-SUCURSAL.
-        OPEN INPUT SUCURSALES.
-        DISPLAY "SUCURSAL A BUSCAR:" TIM-CUIT.
-        PERFORM 4000-LEER-SUCURSAL UNTIL SUC-CUIT EQUAL TIM-CUIT.
-        MOVE SUC-RAZON TO REG-RELEASE-SUC-RAZON.
-        CLOSE SUCURSALES.
-
-      *****************************************************
-      *****************************************************
-       4000-LEER-SUCURSAL.
-        READ SUCURSALES RECORD.
-      *  DISPLAY "REGISTRO:" REG-SUCURSALES.
-
+        CALL "SUBPROGRAMA" USING TIM-CUIT,REG-RELEASE-SUC-RAZON.
+        DISPLAY "RESULTADO RAZON:" REG-RELEASE-SUC-RAZON.
+       
       *****************************************************
       *****************************************************
        0900-BUSCAR-TARIFAS.
