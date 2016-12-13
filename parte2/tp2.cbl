@@ -26,7 +26,7 @@
                           FILE STATUS IS SUC-ESTADO.
         SELECT TARIFAS ASSIGN TO DISK
                        ORGANIZATION IS INDEXED
-                       ACCESS MODE IS DYNAMIC
+                       ACCESS MODE IS SEQUENTIAL
                        RECORD KEY IS TAR-CLAVE
                        FILE STATUS IS TAR-ESTADO.
         SELECT PARAMETROS ASSIGN TO DISK
@@ -270,7 +270,6 @@
        0100-INICIO-ENTRADA.
         OPEN INPUT MAE-TIMES.
         OPEN INPUT PROFESORES.
-        OPEN INPUT TARIFAS.
         OPEN INPUT PARAMETROS.      
 
       *****************************************************
@@ -339,15 +338,31 @@
       *****************************************************
       *****************************************************
        0900-BUSCAR-TARIFAS.
-        MOVE TIM-TIP-CLASE TO TAR-TIP-CLASE.
-        MOVE TIM-FECHA TO TAR-VIG-DES.
-        READ TARIFAS RECORD KEY IS TAR-TIP-CLASE.
-        IF OK-TAR THEN
-           MOVE TAR-TARIFA TO AUX-TARIFA
-           DISPLAY "SE ENCONTRARON TARIFAS"
-        ELSE
-           DISPLAY "NO SE ENCONTRARON TARIFAS".
+      * MOVE TIM-TIP-CLASE TO TAR-TIP-CLASE.
+      *  MOVE TIM-FECHA TO TAR-VIG-DES.        
+        MOVE 0 TO TAR-TIP-CLASE.
+        DISPLAY "TARIFA DE CLASE A BUSCAR:" TIM-TIP-CLASE
+        OPEN INPUT TARIFAS.
+        PERFORM 7000-LEER-TARIFAS UNTIL TIM-TIP-CLASE 
+         EQUAL TAR-TIP-CLASE.
+        PERFORM UNTIL TAR-TIP-CLASE NOT EQUAL TIM-TIP-CLASE OR EOF-TAR
+         MOVE TAR-TARIFA TO AUX-TARIFA
+         PERFORM 7000-LEER-TARIFAS
+         DISPLAY "VALOR A COMPARAR:" TAR-TIP-CLASE
+        END-PERFORM.
+        DISPLAY "LA TARIFA ES:" AUX-TARIFA. 
+        CLOSE TARIFAS.
+      * IF OK-TAR THEN
+      *     MOVE TAR-TARIFA TO AUX-TARIFA
+      *     DISPLAY "SE ENCONTRARON TARIFAS"
+      *  ELSE
+      *     DISPLAY "NO SE ENCONTRARON TARIFAS".
        
+      *****************************************************
+      *****************************************************
+       7000-LEER-TARIFAS.
+        READ TARIFAS RECORD.
+
       *****************************************************
       *****************************************************
        1000-INICIO-SALIDA.
